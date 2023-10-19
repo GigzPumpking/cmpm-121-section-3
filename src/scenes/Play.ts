@@ -27,21 +27,30 @@ export default class Play extends Phaser.Scene {
   }
 
   create() {
+    const width = this.game.config.width as number;
+    const height = this.game.config.height as number;
+
     this.fire = this.#addKey("F");
     this.left = this.#addKey("LEFT");
     this.right = this.#addKey("RIGHT");
 
     this.starfield = this.add
-      .tileSprite(
-        0,
-        0,
-        this.game.config.width as number,
-        this.game.config.height as number,
-        "starfield",
-      )
+      .tileSprite(0, 0, width, height, "starfield")
       .setOrigin(0, 0);
 
-    this.spinner = this.add.rectangle(100, 100, 50, 50, 0xff0000);
+    this.spinner = this.add.rectangle(
+      width / 2,
+      height / 1.1,
+      50,
+      50,
+      0xff0000,
+    );
+    this.physics.world.setBounds(0, 0, width, height);
+    this.spinner.body = new Phaser.Physics.Arcade.Body(
+      this.physics.world,
+      this.spinner,
+    );
+    this.spinner.body.setCollideWorldBounds(true);
   }
 
   update(_timeMs: number, delta: number) {
@@ -49,9 +58,11 @@ export default class Play extends Phaser.Scene {
 
     if (this.left!.isDown) {
       this.spinner!.rotation -= delta * this.rotationSpeed;
+      this.spinner!.x -= 4;
     }
     if (this.right!.isDown) {
       this.spinner!.rotation += delta * this.rotationSpeed;
+      this.spinner!.x += 4;
     }
 
     if (this.fire!.isDown) {
